@@ -102,14 +102,22 @@ if [ $RET -eq 0 ]; then
     NGX=$?
     if [ $NGX -ne 0 ]; then
         echo "Failed to copy ngx_http_lua_module.so, likely build failure"
-        exit 1
+        exit 2
     fi
+
+    cp $LUAJIT_LIB $OUTPUT_FOLDER/
+    NGX=$?
+    if [ $NGX -ne 0 ]; then
+        echo "Failed to copy $LUAJIT_LIB, likely build failure"
+        exit 3
+    fi
+
     sed -i '/^pid/a load_module \/output\/ngx_http_lua_module.so;' /etc/nginx/nginx.conf
     sed -i '/^pid/a load_module \/output\/ndk_http_module.so;' /etc/nginx/nginx.conf
     nginx -t
     if [ $? -ne 0 ]; then
         echo "Module did not work with NGINX"
-        exit 1
+        exit 4
     fi
 
     cd $OUTPUT_FOLDER
@@ -119,5 +127,5 @@ if [ $RET -eq 0 ]; then
 
 else
     echo "Failed Build"
-    exit 1
+    exit 99
 fi
