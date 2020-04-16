@@ -38,3 +38,5 @@ load_module modules/ngx_http_lua_module.so;
 | centos7 | CentOS 7, RHEL7 |
 | ubuntu16 | Ubuntu 16.04 |
 | ubuntu18 | Ubuntu 18.04 |
+| deb7 | Debian 7 |
+| deb8 | Debian 8 |
