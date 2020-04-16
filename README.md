@@ -9,6 +9,7 @@ This Docker example enables you to with a couple easy commands make the dynamic 
 **Building the Container**
 
 The build option will build the Docker container. This will have the base configuration in order to run the build script.
+
 `make build docker_user=USERNAME`
 
 **Running the Container**
