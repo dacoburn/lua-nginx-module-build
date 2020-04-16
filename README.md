@@ -10,11 +10,11 @@ This Docker example enables you to with a couple easy commands make the dynamic 
 
 The build option will build the Docker container. This will have the base configuration in order to run the build script.
 
-`make build docker_user=USERNAME`
+`make build docker_user=USERNAME os=amzl1`
 
 **Running the Container**
 
-`make run-once docker_user=USERNAME`
+`make run-once docker_user=USERNAME os=amzl1`
 
 I recommend creating the `output` folder before running Docker. If you don't it should make it on its own if it doesn't exist. After the execution runs you should have three files:
 
