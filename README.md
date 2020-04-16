@@ -1,4 +1,4 @@
-# amazon-linux-lua-nginx-module-build
+# lua-nginx-module-build
 
 ## Description
 
