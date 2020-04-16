@@ -36,7 +36,4 @@ load_module modules/ngx_http_lua_module.so;
 | amzl2 | Amazon Linux 2 |
 | centos6 | CentOS 6, RHEL6 |
 | centos7 | CentOS 7, RHEL7 |
-| ubuntu16 | Ubuntu 16.04 |
-| ubuntu18 | Ubuntu 18.04 |
-| deb7 | Debian 7 |
-| deb8 | Debian 8 |
+| deb9 | Debian 9 |

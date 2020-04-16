@@ -1,0 +1,20 @@
+FROM debian:9
+
+# 
+ENV DEBIANVER=9
+ENV basearch=x86_64
+ENV BASE_FOLDER=/nginx-build
+ENV OUTPUT_FOLDER=/output
+
+# Copy the build scrip into the image
+COPY scripts/debian_build_module.sh $BASE_FOLDER/debian_build_module.sh
+
+WORKDIR $BASE_FOLDER
+
+# Install the build environment
+RUN sed -i '/deb http:\/\/deb.debian.org\/debian stretch main/a deb-src http:\/\/deb.debian.org\/debian stretch main' /etc/apt/sources.list && \
+    apt update && \
+    apt-get -y install libpam0g-dev libgd-dev libgeoip-dev libxml2-dev libxslt-dev nginx less vim build-essential libpcre3 libpcre3-dev zlibc zlib1g zlib1g-dev apt-transport-https wget gnupg openssl libssl-dev nginx && \
+    chmod +x debian_build_module.sh
+
+ENTRYPOINT ["./debian_build_module.sh"]
