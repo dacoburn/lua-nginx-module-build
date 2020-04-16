@@ -7,7 +7,7 @@ NGINX_VERSION=`nginx -V 2>&1 | grep "nginx version" | awk -F "/" '{print $2}'`
 # Get the yum variant of the version
 NGINX_VERSION_YUM=`rpm -qa nginx | awk 'BEGIN{FS=OFS="."}{NF--; print}'`
 nginxver="nginx-$NGINX_VERSION"
-source_rpm=$NGINX_VERSION_YUM.ngx.src.rpm
+OSID=`cat /etc/os-release | grep -e "^ID=" | awk -F "=" '{print $2}' | sed 's/\"//g'`
 NGINX_FOLDER=$BASE_FOLDER/$nginxver
 source_url=http://nginx.org/packages/centos/$RHELVER/SRPMS
 normal_url=http://nginx.org/packages/centos/$RHELVER/$basearch/RPMS/
@@ -23,26 +23,41 @@ NGX_DEVEL=$EXTRA_FOLDER/ngx_devel_kit-0.3.1rc1
 LUA_MODULE=$EXTRA_FOLDER/lua-nginx-module-0.10.13
 luajit_file=LuaJIT-2.0.5.tar.gz
 
-echo "[nginx]" | tee /etc/yum.repos.d/nginx.repo
-echo "name=nginx repo" | tee -a /etc/yum.repos.d/nginx.repo
-echo "baseurl=http://nginx.org/packages/mainline/centos/$RHELVER/$basearch/" | tee -a /etc/yum.repos.d/nginx.repo
-echo "gpgcheck=0" | tee -a /etc/yum.repos.d/nginx.repo
-echo "enabled=1" | tee -a /etc/yum.repos.d/nginx.repo
+if [ "$OSID" == "amzn" ] || [ "$OSID" == "amzn" ]; then
+    # Steps for Amazon Linux
+    export source_rpm=$NGINX_VERSION_YUM.src.rpm
+    if [ ! -f $source_rpm ]; then
+        # Install the Source RPM
+        yumdownloader --source nginx
+        rpm -i $source_rpm
+        cp /usr/src/rpm/SOURCES/nginx-1.16.1.tar.gz ./
+    fi
 
-echo "[nginx-src]" | tee /etc/yum.repos.d/nginx-src.repo
-echo "name=nginx repo"  | tee -a /etc/yum.repos.d/nginx-src.repo
-echo "baseurl=http://nginx.org/packages/mainline/centos/$RHELVER/SRPMS/" | tee -a /etc/yum.repos.d/nginx-src.repo
-echo "gpgcheck=0" | tee -a /etc/yum.repos.d/nginx-src.repo
-echo "enabled=1" | tee -a /etc/yum.repos.d/nginx-src.repo
+else
+    # Steps for CentOS 6/7
+    echo "[nginx]" | tee /etc/yum.repos.d/nginx.repo
+    echo "name=nginx repo" | tee -a /etc/yum.repos.d/nginx.repo
+    echo "baseurl=http://nginx.org/packages/mainline/centos/$RHELVER/$basearch/" | tee -a /etc/yum.repos.d/nginx.repo
+    echo "gpgcheck=0" | tee -a /etc/yum.repos.d/nginx.repo
+    echo "enabled=1" | tee -a /etc/yum.repos.d/nginx.repo
 
-if [ ! -f $source_rpm ]; then
+    echo "[nginx-src]" | tee /etc/yum.repos.d/nginx-src.repo
+    echo "name=nginx repo"  | tee -a /etc/yum.repos.d/nginx-src.repo
+    echo "baseurl=http://nginx.org/packages/mainline/centos/$RHELVER/SRPMS/" | tee -a /etc/yum.repos.d/nginx-src.repo
+    echo "gpgcheck=0" | tee -a /etc/yum.repos.d/nginx-src.repo
+    echo "enabled=1" | tee -a /etc/yum.repos.d/nginx-src.repo
+    
+    export source_rpm=$NGINX_VERSION_YUM.ngx.src.rpm
+    if [ ! -f $source_rpm ]; then
         wget $source_url/$source_rpm
         rpm -i $source_rpm
+    fi
+
+    if [ ! -f $nginxver.tar.gz ]; then 
+        cp /root/rpmbuild/SOURCES/$nginxver.tar.gz ./
+    fi
 fi
 
-if [ ! -f $nginxver.tar.gz ]; then 
-    cp /root/rpmbuild/SOURCES/$nginxver.tar.gz ./
-fi
 
 if [ ! -d $nginxver ]; then
     tar -zxvf $nginxver.tar.gz

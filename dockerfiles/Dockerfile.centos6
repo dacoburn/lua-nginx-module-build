@@ -1,0 +1,18 @@
+FROM centos:6
+
+# $NGINX_VERSION and $NGINX_VERSION_YUM need to be specified as part of the run
+ENV RHELVER=6
+ENV basearch=x86_64
+ENV BASE_FOLDER=/nginx-build
+ENV OUTPUT_FOLDER=/output
+
+# Copy the build scrip into the image
+COPY redhat_build_module.sh $BASE_FOLDER/redhat_build_module.sh
+
+RUN yum install -y epel-release vi less which tar gcc gcc-c++ make pcre pcre-devel zlib zlib-devel wget gnupg openssl openssl-devel redhat-rpm-config libxslt-devel gd-devel perl-ExtUtils-Embed google-perftools-devel && \
+    yum install -y geoip-devel nginx && \
+    yum makecache
+
+
+WORKDIR $BASE_FOLDER
+ENTRYPOINT ["./redhat_build_module.sh"]
