@@ -30,7 +30,14 @@ if [ "$OSID" == "amzn" ] || [ "$OSID" == "amzn" ]; then
         # Install the Source RPM
         yumdownloader --source nginx
         rpm -i $source_rpm
-        cp /usr/src/rpm/SOURCES/nginx-1.16.1.tar.gz ./
+        if [ -f /root/rpmbuild/SOURCES/$nginxver.tar.gz ]; then
+            cp /root/rpmbuild/SOURCES/$nginxver.tar.gz ./
+        elif [ -f cp /usr/src/rpm/SOURCES/$nginxver.tar.gz ]; then
+            cp /usr/src/rpm/SOURCES/$nginxver.tar.gz ./
+        else
+            echo "Something went wrong with the soruce download"
+            exit 1
+        fi
     fi
 
 else
@@ -53,8 +60,13 @@ else
         rpm -i $source_rpm
     fi
 
-    if [ ! -f $nginxver.tar.gz ]; then 
+    if [ -f /root/rpmbuild/SOURCES/$nginxver.tar.gz ]; then
         cp /root/rpmbuild/SOURCES/$nginxver.tar.gz ./
+    elif [ -f cp /usr/src/rpm/SOURCES/$nginxver.tar.gz ]; then
+        cp /usr/src/rpm/SOURCES/$nginxver.tar.gz ./
+    else
+        echo "Something went wrong with the soruce download"
+        exit 1
     fi
 fi
 
