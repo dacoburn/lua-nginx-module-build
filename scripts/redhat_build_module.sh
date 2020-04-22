@@ -39,7 +39,6 @@ if [ "$OSID" == "amzn" ] || [ "$OSID" == "amzn" ]; then
             exit 1
         fi
     fi
-
 else
     # Steps for CentOS 6/7
     echo "[nginx]" | tee /etc/yum.repos.d/nginx.repo

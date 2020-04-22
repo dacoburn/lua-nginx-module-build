@@ -37,3 +37,5 @@ load_module modules/ngx_http_lua_module.so;
 | centos6 | CentOS 6, RHEL6 | |
 | centos7 | CentOS 7, RHEL7 | |
 | deb9 | Debian 9 | You will need to copy libluajit-5.1.so.2.0.5 to /usr/local/lib/ and then run ldconfig on your Debian 9 Server |
+| ubuntu14 | Ubuntu 14.04 |
+| ubuntu16 | Ubuntu 16.04 |

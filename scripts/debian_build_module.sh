@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #Pin the version to the desired one
-BASE_VERSION=`nginx -V 2>&1 | grep "nginx version" | awk -F "/" '{print $2}'`
+BASE_VERSION=`nginx -V 2>&1 | grep "nginx version" | awk -F "/" '{print $2}' | awk -F " " '{print $1}'`
 VERSION=`dpkg -s nginx | grep Version | awk '{print $2}'`
 NGINX_FOLDER=$BASE_FOLDER/nginx-$BASE_VERSION
 EXTRA_FOLDER=$NGINX_FOLDER/extra
@@ -15,22 +15,28 @@ LUAJIT_LIB=/usr/local/lib/libluajit-5.1.so.2.0.5
 LUAJIT_INC=$EXTRA_FOLDER/LuaJIT-2.0.5/src
 NGX_DEVEL=$EXTRA_FOLDER/ngx_devel_kit-0.3.1rc1
 LUA_MODULE=$EXTRA_FOLDER/lua-nginx-module-0.10.13
+OSINFO=`cat /etc/os-release  | grep -e "^NAME=" | awk -F "\"" '{print $2}'`
 
-if [ ! -d /build/nginx-DhOtPd ]; then
-	mkdir -p /build/nginx-DhOtPd
+if [ "$OSINFO" != "Ubuntu" ]; then
+    # Weird thing had to do for Debian 9
+    if [ ! -d /build/nginx-DhOtPd ]; then
+    	mkdir -p /build/nginx-DhOtPd
+    fi
+
+    # For some reason you have to get the source for this module
+    # and put in this location...
+    cd /build/nginx-DhOtPd
+    apt-get source libnginx-mod-http-auth-pam 
 fi
-
-# For some reason you have to get the source for this module
-# and put in this location...
-cd /build/nginx-DhOtPd
-apt-get source libnginx-mod-http-auth-pam 
-
 # Now we can go back to normal...
 cd $BASE_FOLDER
-apt-get source nginx=$VERSION
+
+    apt-get source nginx=$VERSION
 
 
-if [ ! -d $EXTRA_FOLDER ]; then
+
+if [ ! -d "$EXTRA_FOLDER" ]; then
+    echo "Making Extra Folder: $EXTRA_FOLDER"
 	mkdir -p $EXTRA_FOLDER
 fi
 
@@ -77,6 +83,8 @@ nginx -V 2>&1 | grep "configure arguments" | awk -F 'arguments:' '{print $2 " \\
 echo " --add-dynamic-module=$NGX_DEVEL \\" >> build.sh
 echo " --add-dynamic-module=$LUA_MODULE" >> build.sh
 
+sed -i 's/-fPIE/-fPIC/' build.sh
+
 chmod +x build.sh
 ./build.sh
 
@@ -122,7 +130,7 @@ if [ $RET -eq 0 ]; then
 
     cd $OUTPUT_FOLDER
     tar -czvf $OUTPUT_FOLDER/$BASE_VERSION-lua-module.tar.gz *.so
-    echo "Tar file saved at $OUTPUT_FOLDER/$BASE_VERSION-lua-module.tar.gz"
+    echo "Tar file saved at $OUTPUT_FOLDER/nginx-$BASE_VERSION-lua-module.tar.gz"
 
 
 else
