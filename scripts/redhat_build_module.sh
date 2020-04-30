@@ -20,7 +20,7 @@ if [ $NGINX_CHECK -eq 1 ]; then
     # Since the nginx binary was not found in the path we need hard coded values
     echo "Using Hard Coded NGINX Version, NGINX not found"
     NGINX_VERSION=1.17.10
-    CONFIG_FLAGS='--user=nginx --group=nginx --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-http_gzip_static_module --with-http_stub_status_module --with-http_ssl_module --with-pcre --with-file-aio --without-http_scgi_module --without-http_uwsgi_module --without-http_fastcgi_module --with-cc-opt=-O2 --with-ld-opt=-Wl,-rpath,/usr/local/lib --add-module=/home/ec2-user/ngx_devel_kit-master'
+    CONFIG_FLAGS='--user=nginx --group=nginx --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-http_gzip_static_module --with-http_stub_status_module --with-http_ssl_module --with-pcre --with-file-aio --without-http_scgi_module --without-http_uwsgi_module --without-http_fastcgi_module --with-cc-opt=-O2 --with-ld-opt=-Wl,-rpath,/usr/local/lib'
 else
     # nginx was found in the path, so getting the info dynamically
     NGINX_VERSION=`nginx -V 2>&1 | grep "nginx version" | awk -F "/" '{print $2}'`
