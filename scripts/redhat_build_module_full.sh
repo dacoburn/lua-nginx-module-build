@@ -56,11 +56,19 @@ if [ $NGINX_CHECK -eq 1 ]; then
     # Since the nginx binary was not found in the path we need hard coded values
     echo "Using Hard Coded NGINX Version, NGINX not found"
     NGINX_VERSION=1.17.10
-    CONFIG_FLAGS='--user=nginx --group=nginx --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-http_gzip_static_module --with-http_stub_status_module --with-http_ssl_module --with-pcre --with-file-aio --without-http_scgi_module --without-http_uwsgi_module --without-http_fastcgi_module --with-cc-opt=-O2 --with-ld-opt=-Wl,-rpath,/usr/local/lib --add-module=/home/ec2-user/ngx_devel_kit-master'
+    CONFIG_FLAGS='--user=nginx --group=nginx --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --conf-path=/etc/nginx/nginx.conf --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --with-http_gzip_static_module --with-http_stub_status_module --with-http_ssl_module --with-pcre --with-file-aio --without-http_scgi_module --without-http_uwsgi_module --without-http_fastcgi_module --with-cc-opt=-O2 --with-ld-opt=-Wl,-rpath,/usr/local/lib'
 else
     # nginx was found in the path, so getting the info dynamically
     NGINX_VERSION=`nginx -V 2>&1 | grep "nginx version" | awk -F "/" '{print $2}'`
-    CONFIG_FLAGS=`nginx -V 2>&1 | grep "configure arguments" | awk -F 'arguments:' '{print $2 " \\"}'`
+    if [ -z $NGINX_VERSION ]; then
+        echo "Unable to get NGINX Version from nginx binary"
+        exit 1
+    fi
+    CONFIG_FLAGS=`nginx -V 2>&1 | grep "configure arguments" | awk -F 'arguments:' '{print $2}'`
+    if [ -z $CONFIG_FLAGS ]; then
+        echo "Unable to get Build Flags from NGINX Binary"
+        exit 1
+    fi
 fi
 
 # Building out variables needed
@@ -154,7 +162,6 @@ cd $NGINX_FOLDER
 # Configure NGINX based on the build flags for the installed nginx or the
 # manually provided flags
 echo "#!/bin/bash" > build.sh
-CONFIG_FLAGS+=" \\"
 echo "./configure \\" >> build.sh
 echo "$CONFIG_FLAGS \\" >> build.sh
 echo " --add-dynamic-module=$ngx_devel_location \\" >> build.sh
@@ -226,7 +233,7 @@ if [ $RET -eq 0 ]; then
         grep -q "#user  nobody;" /etc/nginx/nginx.conf
         grep_result=$?
         if [ $grep_result -eq 0 ]; then
-            $preifx sed -i 's/#user  nobody;/user  nobody;/g' /etc/nginx/nginx.conf
+            $prefix sed -i 's/#user  nobody;/user  nobody;/g' /etc/nginx/nginx.conf
         fi
 
         # Now that the nginx.conf is set to load the freshly built modules we
