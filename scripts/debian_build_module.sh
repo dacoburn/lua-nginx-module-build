@@ -141,8 +141,8 @@ RET=$?
 if [ $RET -eq 0 ]; then
     # Make the $OUTPUT_FOLDER to copy the dynamic modules to and make the final
     # tar file for distribution.
-    lib_folder=$OUTPUT_FOLDER/usr/lib
-    modules_folder=$lib_folder/modules
+    lib_folder=$OUTPUT_FOLDER
+    modules_folder=$lib_folder
     mkdir -p $modules_folder
     echo "Successful Build"
     
@@ -179,13 +179,13 @@ if [ $RET -eq 0 ]; then
         grep -q "ngx_http_lua_module.so;" /etc/nginx/nginx.conf
         grep_result=$?
         if [ $grep_result -ne 0 ]; then
-            sed -i '/pid;/a load_module \/output\/usr\/lib\/modules\/ngx_http_lua_module.so;' /etc/nginx/nginx.conf
+            sed -i '/pid;/a load_module '"$modules_folder"'/ngx_http_lua_module.so;' /etc/nginx/nginx.conf
         fi
         # Check to see if the ndk module has already been added to the nginx.conf
         grep -q "ndk_http_module.so;" /etc/nginx/nginx.conf
         grep_result=$?
         if [ $grep_result -ne 0 ]; then
-            sed -i '/pid;/a load_module \/output\/usr\/lib\/modules\/ndk_http_module.so;' /etc/nginx/nginx.conf
+            sed -i '/pid;/a load_module '"$modules_folder"'/ndk_http_module.so;' /etc/nginx/nginx.conf
         fi
         # Check to see if the nobody user is already enabled
         grep -q "#user  nobody;" /etc/nginx/nginx.conf
