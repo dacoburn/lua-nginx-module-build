@@ -192,9 +192,10 @@ RET=$?
 if [ $RET -eq 0 ]; then
     # Make the $OUTPUT_FOLDER to copy the dynamic modules to and make the final
     # tar file for distribution.
-    lib_folder=$OUTPUT_FOLDER/usr/lib
-    modules_folder=$lib_folder/modules
-    mkdir -p 
+    lib_folder=$OUTPUT_FOLDER
+    modules_folder=$OUTPUT_FOLDER
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lib:/usr/lib:/usr/local/lib
+    #mkdir -p $modules_folder
     echo "Successful Build"
     
     # Copy and verify that the copy of ndk_http_module.so to the output folder
@@ -218,6 +219,7 @@ if [ $RET -eq 0 ]; then
     # I seem to include the lib lua jit on centos7. I'm adding it to the output
     # folder
     cp /usr/local/lib/libluajit* $lib_folder/
+    ldconfig
 
 
     # Check to see if NGINX is installed in the path now. If for some reason it 
@@ -230,13 +232,13 @@ if [ $RET -eq 0 ]; then
         grep -q "ngx_http_lua_module.so;" /etc/nginx/nginx.conf
         grep_result=$?
         if [ $grep_result -ne 0 ]; then
-            sed -i '/pid;/a load_module \/output\/usr\/lib\/modules\/ngx_http_lua_module.so;' /etc/nginx/nginx.conf
+            sed -i '/pid;/a load_module '"$lib_folder"'/ngx_http_lua_module.so;' /etc/nginx/nginx.conf
         fi
         # Check to see if the ndk module has already been added to the nginx.conf
         grep -q "ndk_http_module.so;" /etc/nginx/nginx.conf
         grep_result=$?
         if [ $grep_result -ne 0 ]; then
-            sed -i '/pid;/a load_module \/output\/usr\/lib\/modules\/ndk_http_module.so;' /etc/nginx/nginx.conf
+            sed -i '/pid;/a load_module '"$lib_folder"'/ndk_http_module.so;' /etc/nginx/nginx.conf
         fi
         # Check to see if the nobody user is already enabled
         grep -q "#user  nobody;" /etc/nginx/nginx.conf
@@ -245,6 +247,9 @@ if [ $RET -eq 0 ]; then
             sed -i 's/#user  nobody;/user  nobody;/g' /etc/nginx/nginx.conf
         fi
 
+        # Adding as this is needed for the latest versions of lua from Openresty
+        sed -i '/http.*{/a lua_load_resty_core off;' /etc/nginx/nginx.conf
+        
         # Now that the nginx.conf is set to load the freshly built modules we
         # check to see if they are binary compaitable with the nginx binary.
         # If they are then everything was good.

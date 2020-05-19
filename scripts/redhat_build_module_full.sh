@@ -236,6 +236,9 @@ if [ $RET -eq 0 ]; then
             $prefix sed -i 's/#user  nobody;/user  nobody;/g' /etc/nginx/nginx.conf
         fi
 
+        # Adding as this is needed for the latest versions of lua from Openresty
+        sed -i '/http.*{/a lua_load_resty_core off;' /etc/nginx/nginx.conf
+
         # Now that the nginx.conf is set to load the freshly built modules we
         # check to see if they are binary compaitable with the nginx binary.
         # If they are then everything was good.

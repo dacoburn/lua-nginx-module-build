@@ -13,7 +13,9 @@ RUN yum install -y yum-utils less which tar gcc gcc-c++ make pcre pcre-devel zli
     yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
     yum-config-manager --enable epel && \
     yum install -y nginx && \
-    yum makecache
+    yum makecache && \
+    chmod +x $BASE_FOLDER/redhat_build_module.sh
+
 
 
 WORKDIR $BASE_FOLDER
