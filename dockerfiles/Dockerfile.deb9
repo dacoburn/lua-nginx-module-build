@@ -15,6 +15,7 @@ WORKDIR $BASE_FOLDER
 RUN sed -i '/deb http:\/\/deb.debian.org\/debian stretch main/a deb-src http:\/\/deb.debian.org\/debian stretch main' /etc/apt/sources.list && \
     apt update && \
     apt-get -y install libpam0g-dev libgd-dev libgeoip-dev libxml2-dev libxslt-dev nginx less vim build-essential libpcre3 libpcre3-dev zlibc zlib1g zlib1g-dev apt-transport-https wget gnupg openssl libssl-dev nginx && \
-    chmod +x debian_build_module.sh
+    chmod +x debian_build_module.sh && \
+    chmod +x $BASE_FOLDER/debian_build_module.sh
 
 ENTRYPOINT ["./debian_build_module.sh"]

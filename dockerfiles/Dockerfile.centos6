@@ -11,7 +11,8 @@ COPY scripts/redhat_build_module.sh $BASE_FOLDER/redhat_build_module.sh
 
 RUN yum install -y epel-release vi less which tar gcc gcc-c++ make pcre pcre-devel zlib zlib-devel wget gnupg openssl openssl-devel redhat-rpm-config libxslt-devel gd-devel perl-ExtUtils-Embed google-perftools-devel && \
     yum install -y geoip-devel nginx && \
-    yum makecache
+    yum makecache && \
+    chmod +x $BASE_FOLDER/redhat_build_module.sh
 
 
 WORKDIR $BASE_FOLDER
